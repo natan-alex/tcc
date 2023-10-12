@@ -71,7 +71,6 @@ matchTemplateTriggerElement.addEventListener('click', () => {
 
     const matchResult = matchTemplate();
     showMatchResult(matchResult);
-    deleteImages();
 
     matchTemplateTriggerElement.blur();
     matchResultElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -118,15 +117,6 @@ function showMatchResult(locations) {
     );
 
     cv.imshow(matchResultElement, sourceImage);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-function deleteImages() {
-  try {
-    sourceImage.delete();
-    templateImage.delete();
   } catch (error) {
     console.error(error);
   }
