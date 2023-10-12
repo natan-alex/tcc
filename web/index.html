@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Template matching</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+  <section>
+    <h2>Source image</h2>
+    <hr />
+    <input type="file" id="source-image-file" name="sourceImageFile" />
+    <img id="source-image" />
+  </section>
+
+  <section>
+    <h2>Template image</h2>
+    <hr />
+    <input type="file" id="template-image-file" name="templateImageFile" />
+    <img id="template-image" />
+  </section>
+
+  <section>
+    <button type="button" id="match-template-trigger">Match template</button>
+  </section>
+
+  <section>
+    <h2>Match result</h2>
+    <hr />
+    <p id="match-result-placeholder">Nothing to show yet</p>
+    <canvas id="match-result"></canvas>
+  </section>
+
+  <script async type="module" src="main.js"></script>
+</body>
+
+</html>

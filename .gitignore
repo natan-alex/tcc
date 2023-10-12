@@ -1,0 +1,11 @@
+native/CMakeLists.txt.user
+native/CMakeCache.txt
+native/CMakeFiles
+native/CMakeScripts
+native/Testing
+native/Makefile
+native/cmake_install.cmake
+native/install_manifest.txt
+native/compile_commands.json
+native/CTestTestfile.cmake
+native/_deps
