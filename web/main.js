@@ -15,6 +15,8 @@ const matchResultElement = document.getElementById('match-result');
 const matchTemplateTriggerElement = document.getElementById('match-template-trigger');
 const matchResultPlaceholderElement = document.getElementById('match-result-placeholder');
 
+const timeElapsedElement = document.getElementById('time-elapsed');
+
 const matchResultRectangleProperties = {
   thickness: 2,
   lineType: cv.LINE_8,
@@ -37,6 +39,7 @@ scrollIntoViewOnFocus(matchTemplateTriggerElement);
 scrollIntoViewOnFocus(matchResultElement);
 
 matchResultElement.style.display = 'none';
+timeElapsedElement.style.display = 'none';
 matchResultPlaceholderElement.style.display = 'block';
 
 sourceFileElement.addEventListener('change', () => {
@@ -53,6 +56,18 @@ templateFileElement.addEventListener('change', () => {
   templateImageElement.src = URL.createObjectURL(file);
 });
 
+sourceFileElement.addEventListener('change', () => {
+  matchResultElement.style.display = 'none';
+  timeElapsedElement.style.display = 'none';
+  matchResultPlaceholderElement.style.display = 'block';
+});
+
+templateFileElement.addEventListener('change', () => {
+  matchResultElement.style.display = 'none';
+  timeElapsedElement.style.display = 'none';
+  matchResultPlaceholderElement.style.display = 'block';
+});
+
 sourceImageElement.addEventListener('load', () => {
   sourceImage = cv.imread(sourceImageElement);
 
@@ -67,10 +82,13 @@ templateImageElement.addEventListener('load', () => {
 matchTemplateTriggerElement.addEventListener('click', () => {
   if (!!sourceImage && !!templateImage) {
     matchResultElement.style.display = 'block';
+    timeElapsedElement.style.display = 'none';
     matchResultPlaceholderElement.style.display = 'none';
 
     const matchResult = matchTemplate();
-    showMatchResult(matchResult);
+
+    showMatchResult(matchResult.locations);
+    showTimeSpentToMatchTemplate(matchResult.timeElapsed);
 
     matchTemplateTriggerElement.blur();
     matchResultElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -85,16 +103,23 @@ function matchTemplate() {
     const mask = new cv.Mat();
     const matchResult = new cv.Mat();
 
+    const start = performance.now();
+
     cv.matchTemplate(sourceImage, templateImage, matchResult, cv.TM_CCOEFF_NORMED, mask);
+
+    const end = performance.now();
+
+    const timeElapsed = end - start;
 
     const locations = cv.minMaxLoc(matchResult, mask);
 
     mask.delete();
     matchResult.delete();
 
-    return locations;
+    return { locations, timeElapsed };
   } catch (error) {
     console.error(error);
+    return {};
   }
 }
 
@@ -119,5 +144,12 @@ function showMatchResult(locations) {
     cv.imshow(matchResultElement, sourceImage);
   } catch (error) {
     console.error(error);
+  }
+}
+
+function showTimeSpentToMatchTemplate(timeElapsed) {
+  if (typeof timeElapsed === 'number') {
+    timeElapsedElement.innerText = `Time elapsed to match template: ${timeElapsed}ms`;
+    timeElapsedElement.style.display = 'block';
   }
 }

@@ -1,3 +1,7 @@
+#include <chrono>
+#include <iostream>
+#include <ratio>
+
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -14,9 +18,15 @@ int main() {
     cv::Point minLoc, maxLoc;
     double minVal, maxVal;
 
+    auto start = std::chrono::steady_clock::now();
 
     // Perform template matching using NCC
     cv::matchTemplate(source_image, template_image, result, cv::TM_CCOEFF_NORMED);
+
+    auto end = std::chrono::steady_clock::now();
+
+    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
     cv::minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
 
 
@@ -35,6 +45,7 @@ int main() {
     cv::imshow("Result", source_image);
     cv::waitKey(0);
 
+    std::cout << "Time elapsed: " << elapsedTime << "ms" << std::endl;
 
     return 0;
 }
