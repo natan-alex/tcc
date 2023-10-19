@@ -1,6 +1,11 @@
+#include <algorithm>
 #include <chrono>
+#include <cstddef>
 #include <iostream>
 #include <ratio>
+#include <filesystem>
+#include <string>
+#include <vector>
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -8,14 +13,16 @@
 #include "opencv2/imgcodecs/imgcodecs.hpp"
 
 int main() {
-    cv::Mat source_image = cv::imread("../assets/nature.jpg");
-    cv::Mat template_image = cv::imread("../assets/nature-tree.png");
+    std::string n = "9";
 
+    std::string source_image_path = "../assets/image" + n + ".jpg";
+    std::string template_image_path = "../assets/template" + n + ".png";
+
+    cv::Mat source_image = cv::imread(source_image_path);
+    cv::Mat template_image = cv::imread(template_image_path);
 
     cv::Mat mask;
     cv::Mat result;
-    cv::Point minLoc, maxLoc;
-    double minVal, maxVal;
 
     auto start = std::chrono::steady_clock::now();
 
@@ -25,23 +32,27 @@ int main() {
 
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-    cv::minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
+    // double minVal, maxVal;
+    // cv::Point minLoc, maxLoc;
+    // cv::minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
+    //
+    // cv::Point rect_bottom_right(
+    //   maxLoc.x + template_image.cols,
+    //   maxLoc.y + template_image.rows
+    // );
+    //
+    // cv::Scalar rect_color = cv::Scalar(0, 0, 255);
+    //
+    // cv::rectangle(source_image, maxLoc, rect_bottom_right, rect_color, 2);
+    //
+    // cv::imshow("Result", source_image);
+    // cv::waitKey(0);
 
-
-    cv::Point rect_bottom_right(
-        maxLoc.x + template_image.cols,
-        maxLoc.y + template_image.rows
-    );
-
-    cv::Scalar rect_color = cv::Scalar(0, 0, 255);
-
-    cv::rectangle(source_image, maxLoc, rect_bottom_right, rect_color, 2);
-
-
-    cv::imshow("Result", source_image);
-    cv::waitKey(0);
-
-    std::cout << "Time elapsed: " << elapsedTime << "ms" << std::endl;
+    std::cout << "Image: " << source_image_path << std::endl;
+    std::cout << "\tWidth: " << source_image.cols << std::endl;
+    std::cout << "\tHeight: " << source_image.rows << std::endl;
+    std::cout << "\tTime elapsed: " << elapsedTime << "ms" << std::endl;
+    std::cout << std::endl;
 
     return 0;
 }
