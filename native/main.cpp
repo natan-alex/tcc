@@ -14,6 +14,7 @@ int main() {
 
 
     // Initialize variables
+    cv::Mat mask;
     cv::Mat result;
     cv::Point minLoc, maxLoc;
     double minVal, maxVal;
@@ -21,7 +22,7 @@ int main() {
     auto start = std::chrono::steady_clock::now();
 
     // Perform template matching using NCC
-    cv::matchTemplate(source_image, template_image, result, cv::TM_CCOEFF_NORMED);
+    cv::matchTemplate(source_image, template_image, result, cv::TM_CCOEFF_NORMED, mask);
 
     auto end = std::chrono::steady_clock::now();
 
