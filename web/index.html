@@ -1,41 +1,101 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Template matching</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Template matching</title>
-  <link rel="stylesheet" href="index.css">
-</head>
+  <body>
+    <section class="section">
+      <h2 class="section-title">Source images</h2>
 
-<body>
-  <section>
-    <h2>Source image</h2>
-    <hr />
-    <input type="file" id="source-image-file" name="sourceImageFile" />
-    <img id="source-image" />
-  </section>
+      <hr class="separator" />
 
-  <section>
-    <h2>Template image</h2>
-    <hr />
-    <input type="file" id="template-image-file" name="templateImageFile" />
-    <img id="template-image" />
-  </section>
+      <input
+        type="file"
+        multiple="multiple"
+        id="source-files-selector"
+        class="files-selector"
+        name="sourceFilesSelector"
+      />
 
-  <section>
-    <button type="button" id="match-template-trigger">Match template</button>
-  </section>
+      <div id="source-images-container" class="images-container">
+        <div class="image-being-shown-container">
+          <img id="source-image-being-shown" />
+        </div>
 
-  <section>
-    <h2>Match result</h2>
-    <hr />
-    <p id="match-result-placeholder">Nothing to show yet</p>
-    <canvas id="match-result"></canvas>
-    <p id="time-elapsed"></p>
-  </section>
+        <aside
+          id="source-images-side-list" 
+          class="side-list one-column"
+        ></aside>
+      </div>
+    </section>
 
-  <script type="module" src="main.js"></script>
-</body>
+    <section class="section">
+      <h2 class="section-title">Template images</h2>
 
+      <hr class="separator" />
+
+      <input
+        type="file"
+        multiple="multiple"
+        id="template-files-selector"
+        class="files-selector"
+        name="templateFilesSelector"
+      />
+
+      <div id="template-images-container" class="images-container">
+        <div class="image-being-shown-container">
+          <img id="template-image-being-shown" />
+        </div>
+
+        <aside
+          id="template-images-side-list"
+          class="side-list multi-column"
+        ></aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <button type="button" id="match-templates" class="button">
+        Match templates
+      </button>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Match results</h2>
+      <hr class="separator" />
+      <p id="match-results-placeholder">Nothing to show yet</p>
+      <div id="match-results-container"></div>
+    </section>
+
+    <table id="summary" class="table">
+      <thead>
+        <tr>
+          <th>Source image</th>
+          <th>Source width (px)</th>
+          <th>Source height (px)</th>
+          <th>Template image</th>
+          <th>Template width (px)</th>
+          <th>Template height (px)</th>
+          <th>Time (ms)</th>
+        </tr>
+      </thead>
+      <tbody id="summary-body">
+      </tbody>
+    </table>
+
+    <div id="times-container" class="table-container">
+      <table id="times" class="table">
+        <thead id="times-header">
+        </thead>
+        <tbody id="times-body">
+        </tbody>
+      </table>
+    </div>
+
+    <script type="module" src="main.js"></script>
+  </body>
 </html>

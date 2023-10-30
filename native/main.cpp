@@ -1,58 +1,110 @@
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
-#include <iostream>
-#include <ratio>
 #include <filesystem>
+#include <iostream>
+#include <map>
+#include <numeric>
+#include <ratio>
 #include <string>
 #include <vector>
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/imgcodecs/imgcodecs.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
+namespace fs = std::filesystem;
+
+const auto ITERATIONS = 20;
 
 int main() {
-    std::string n = "9";
+    auto source_paths = std::vector<std::string>();
+    auto template_paths = std::vector<std::string>();
 
-    std::string source_image_path = "../assets/image" + n + ".jpg";
-    std::string template_image_path = "../assets/template" + n + ".png";
+    for (const auto &entry : fs::directory_iterator("../assets")) {
+        const auto path = entry.path();
+        const auto filename = path.filename().string();
+        const auto extension = path.extension();
 
-    cv::Mat source_image = cv::imread(source_image_path);
-    cv::Mat template_image = cv::imread(template_image_path);
+        if (extension == ".jpg" || extension == ".jpeg" || extension == ".png") {
+            if (filename.rfind("image", 0) == 0)
+                source_paths.push_back(path);
+            else
+                template_paths.push_back(path);
+        }
+    }
 
-    cv::Mat mask;
-    cv::Mat result;
+    std::sort(source_paths.begin(), source_paths.end());
+    std::sort(template_paths.begin(), template_paths.end());
 
-    auto start = std::chrono::steady_clock::now();
+    auto source_mats = std::vector<cv::Mat>();
+    auto template_mats = std::vector<cv::Mat>();
 
-    cv::matchTemplate(source_image, template_image, result, cv::TM_CCOEFF_NORMED, mask);
+    for (size_t i = 0; i < source_paths.size(); ++i) {
+        source_mats.push_back(cv::imread(source_paths[i]));
+        template_mats.push_back(cv::imread(template_paths[i]));
+    }
 
-    auto end = std::chrono::steady_clock::now();
+    auto pathsAndTimes = std::map<std::string, std::vector<long>>();
 
-    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    for (size_t i = 0; i < source_mats.size() * ITERATIONS; ++i) {
+        const auto index = i % source_mats.size();
 
-    // double minVal, maxVal;
-    // cv::Point minLoc, maxLoc;
-    // cv::minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
-    //
-    // cv::Point rect_bottom_right(
-    //   maxLoc.x + template_image.cols,
-    //   maxLoc.y + template_image.rows
-    // );
-    //
-    // cv::Scalar rect_color = cv::Scalar(0, 0, 255);
-    //
-    // cv::rectangle(source_image, maxLoc, rect_bottom_right, rect_color, 2);
-    //
-    // cv::imshow("Result", source_image);
-    // cv::waitKey(0);
+        cv::Mat mask = cv::Mat();
+        cv::Mat result = cv::Mat();
 
-    std::cout << "Image: " << source_image_path << std::endl;
-    std::cout << "\tWidth: " << source_image.cols << std::endl;
-    std::cout << "\tHeight: " << source_image.rows << std::endl;
-    std::cout << "\tTime elapsed: " << elapsedTime << "ms" << std::endl;
-    std::cout << std::endl;
+        const auto start = std::chrono::steady_clock::now();
+
+        cv::matchTemplate(source_mats[index], template_mats[index], result, cv::TM_CCOEFF_NORMED, mask);
+
+        const auto end = std::chrono::steady_clock::now();
+
+        const auto time_elapsed =
+            std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+            .count();
+
+        if (pathsAndTimes.find(source_paths[index]) == pathsAndTimes.end()) {
+            pathsAndTimes[source_paths[index]] = std::vector<long>();
+        }
+
+        pathsAndTimes[source_paths[index]].push_back(time_elapsed);
+    }
+
+    std::cout
+        << "Source\t"
+        << "Source width\t"
+        << "Source height\t"
+        << "Template\t"
+        << "Template width\t"
+        << "Template height\t"
+        << "Average time"
+        << std::endl;
+
+    for (size_t i = 0; i < source_paths.size(); ++i) {
+        const auto times = pathsAndTimes[source_paths[i]];
+        const auto sum = std::accumulate(times.begin(), times.end(), 0LL);
+        const auto average = 1.0 * sum / times.size();
+
+        std::cout 
+            << source_paths[i] << "\t"
+            << source_mats[i].cols << "\t"
+            << source_mats[i].rows << "\t"
+            << template_paths[i] << "\t"
+            << template_mats[i].cols << "\t"
+            << template_mats[i].rows << "\t"
+            << average << std::endl;
+    }
+
+    for (size_t i = 0; i < source_paths.size(); ++i) {
+        const auto times = pathsAndTimes[source_paths[i]];
+
+        for (const auto time : times) {
+            std::cout << time << "\t";
+        }
+
+        std::cout << std::endl;
+    }
 
     return 0;
 }
