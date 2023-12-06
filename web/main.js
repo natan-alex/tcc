@@ -1,9 +1,15 @@
 // import { initOpenCV } from './opencv-js.js';
 // import { initOpenCV } from './opencv-wasm.js';
-import { initOpenCV } from './opencv-js.min.js';
-// import { initOpenCV } from './opencv-wasm.min.js';
+// import { initOpenCV } from './opencv-js.min.js';
+import { initOpenCV } from './opencv-wasm.min.js';
+
+const start = performance.now();
 
 const cv = await initOpenCV();
+
+const end = performance.now();
+
+console.log('Time to init opencv: ', +(end - start).toFixed(2));
 
 const iterations = 20;
 
